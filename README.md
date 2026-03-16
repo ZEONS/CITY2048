@@ -1,3 +1,8 @@
+[실행]
+
+https://zeons.github.io/CITY2048/
+
+
 [노트북LM, 구글 안티그래비티]
 
 노트북LM 과 구글 안티그래비티 (Google Antigravity) 를 이용해서 바이브 코딩으로 만든 2048 게임입니다.
