@@ -16,7 +16,7 @@ class ZeonsCity2048 {
             localStorage.setItem(newKey, oldScore);
             // localStorage.removeItem(oldKey); // 기존 데이터 보존을 위해 삭제하지 않음
         }
-        
+
         this.bestScore = parseInt(localStorage.getItem(newKey)) || 0;
         this.tileContainer = document.getElementById('tile-container');
         this.scoreDisplay = document.getElementById('score');
@@ -25,17 +25,18 @@ class ZeonsCity2048 {
         this.bgm = document.getElementById('bgm');
         this.bgm.volume = 0.25; // 볼륨 낮춤
         this.bgmEnabled = true;
-        
+
         this.milestones = [3, 6, 9, 12, 15, 17];
         this.reachedMilestones = new Set();
-        
+
         this.jokerCount = 0; // 시작 시 0개
-        this.nextTileId = 0; 
-        
+        this.nextTileId = 0;
+
         // 숫자 표시 설정 (로컬 스토리지 유지)
         this.showValues = localStorage.getItem('zeons-show-values') !== 'false';
-        
+
         this.isLocked = false; // 입력 잠금 플래그
+        this.currentLevel = 1; // 현재 도시 레벨
         this.introTimeout = null;
         this.weatherTimer = null; // 날씨 타이머 관용
         this.currentTrackIndex = -1; // 현재 재생 중인 트랙 인덱스
@@ -55,7 +56,7 @@ class ZeonsCity2048 {
     init() {
         this.setupBoard();
         this.addEventListeners();
-        
+
         // 베스트 스코어 박스 클릭 시 초기화 기능 연결
         const bestBox = this.bestScoreDisplay.parentElement;
         if (bestBox) {
@@ -97,24 +98,24 @@ class ZeonsCity2048 {
     initWeatherEffect() {
         const container = document.getElementById('weather-container');
         if (!container) return;
-        
+
         container.innerHTML = ''; // 기존 배출물 제거
         container.style.opacity = '1';
-        
+
         const season = this.currentSeason;
         let baseCount = 0;
         let type = '';
-        
-        switch(season) {
+
+        switch (season) {
             case 'spring': baseCount = 15; type = 'petal'; break;
             case 'summer': baseCount = 20; type = 'dust'; this.addSunRay(container); break;
             case 'autumn': baseCount = 15; type = 'leaf'; break;
             case 'winter': baseCount = 30; type = 'snowflake'; break;
         }
-        
+
         // 양을 무작위로 조절 (간헐적/변동성)
         const count = Math.floor(baseCount * (0.5 + Math.random()));
-        
+
         for (let i = 0; i < count; i++) {
             this.createWeatherParticle(container, type);
         }
@@ -125,7 +126,7 @@ class ZeonsCity2048 {
             // 서서히 사라짐
             container.style.transition = 'opacity 3s';
             container.style.opacity = '0';
-            
+
             // 다음 이벤트까지의 공백기 (10~30초)
             const gapDuration = 10000 + Math.random() * 20000;
             this.weatherTimer = setTimeout(() => {
@@ -143,21 +144,21 @@ class ZeonsCity2048 {
     createWeatherParticle(container, type) {
         const p = document.createElement('div');
         p.className = type;
-        
+
         // 무작위 초기 위치 설정
         const startLeft = Math.random() * 100;
         const startTop = Math.random() * 100;
         const delay = Math.random() * 5;
         const duration = 5 + Math.random() * 5;
         const size = (type === 'snowflake' || type === 'dust') ? (2 + Math.random() * 4) : (8 + Math.random() * 10);
-        
+
         p.style.left = `${startLeft}%`;
         p.style.top = `-20px`; // 상단 밖에서 시작
         p.style.width = `${size}px`;
         p.style.height = `${size}px`;
         p.style.animationDelay = `-${delay}s`; // 미리 시작된 것처럼 연출
         p.style.animationDuration = `${duration}s`;
-        
+
         if (type === 'petal') {
             p.style.animationName = 'blossomFall';
         } else if (type === 'dust') {
@@ -171,23 +172,23 @@ class ZeonsCity2048 {
             p.style.animationName = 'snowFall';
             p.style.opacity = 0.3 + Math.random() * 0.5;
         }
-        
+
         container.appendChild(p);
     }
 
     playRandomBGM() {
         if (!this.bgmTracks || this.bgmTracks.length === 0) return;
-        
+
         this.currentTrackIndex = Math.floor(Math.random() * this.bgmTracks.length);
         this.playBGM(this.currentTrackIndex);
     }
 
     playNextBGM() {
         if (!this.bgmTracks || this.bgmTracks.length === 0) return;
-        
+
         this.currentTrackIndex = (this.currentTrackIndex + 1) % this.bgmTracks.length;
         this.playBGM(this.currentTrackIndex);
-        
+
         // 시각적 피드백 (반짝임)
         const bgmInfo = document.getElementById('bgm-info');
         if (bgmInfo) {
@@ -200,13 +201,13 @@ class ZeonsCity2048 {
         const selectedTrack = this.bgmTracks[index];
         const bgmElement = document.getElementById('bgm');
         const trackNameElement = document.getElementById('bgm-track-name');
-        
+
         if (bgmElement) {
             bgmElement.src = selectedTrack.url;
             bgmElement.load();
             bgmElement.play().catch(e => console.log("BGM 재생 대기: 사용자 조작 필요"));
         }
-        
+
         if (trackNameElement) {
             trackNameElement.textContent = `BGM: ${selectedTrack.name}`;
         }
@@ -249,28 +250,28 @@ class ZeonsCity2048 {
         const tile = document.createElement('div');
         const value = tileObj.value;
         const isJoker = (value === 'joker');
-        
+
         tile.className = `tile ${isJoker ? 'tile-joker' : 'tile-' + value} ${isMerged ? 'tile-merged' : ''}`;
         tile.dataset.id = tileObj.id; // ID 저장
-        
+
         tile.style.setProperty('--r', r);
         tile.style.setProperty('--c', c);
-        
+
         const inner = document.createElement('div');
         inner.className = 'tile-inner';
-        
+
         // 빌딩 이미지를 위한 별도 레이어 (역회전용)
         const building = document.createElement('div');
         building.className = 'tile-building';
         inner.appendChild(building);
-        
+
         const valueDisplay = document.createElement('div');
         valueDisplay.className = 'tile-value';
         valueDisplay.textContent = isJoker ? 'J' : value;
         inner.appendChild(valueDisplay);
-        
+
         tile.appendChild(inner);
-        
+
         return tile;
     }
 
@@ -285,7 +286,7 @@ class ZeonsCity2048 {
                 if (tileObj) {
                     activeIds.push(String(tileObj.id));
                     let element = currentElements.find(el => el.dataset.id === String(tileObj.id));
-                    
+
                     if (element) {
                         // 기존 타일 위치 업데이트 (이동 애니메이션 트리거)
                         element.style.setProperty('--r', r);
@@ -293,13 +294,13 @@ class ZeonsCity2048 {
                         // 값 변경 대응 (병합 시)
                         const isJoker = (tileObj.value === 'joker');
                         element.className = `tile ${isJoker ? 'tile-joker' : 'tile-' + tileObj.value}`;
-                        
+
                         // 숫자 라벨 업데이트 추가
                         const valDisplay = element.querySelector('.tile-value');
                         if (valDisplay) {
                             valDisplay.textContent = isJoker ? 'J' : tileObj.value;
                         }
-                        
+
                         if (mergedIds.includes(tileObj.id)) {
                             element.classList.add('tile-merged');
                             setTimeout(() => element.classList.remove('tile-merged'), 200);
@@ -349,7 +350,7 @@ class ZeonsCity2048 {
         // 방향 상수: 0: Up, 1: Right, 2: Down, 3: Left
         const rotations = { 'ArrowUp': 3, 'ArrowRight': 2, 'ArrowDown': 1, 'ArrowLeft': 0 };
         const reverseRotations = { 'ArrowUp': 1, 'ArrowRight': 2, 'ArrowDown': 3, 'ArrowLeft': 0 };
-        
+
         if (rotations[direction] === undefined) return;
 
         // 이동 효과 (Tilt) 적용
@@ -366,19 +367,19 @@ class ZeonsCity2048 {
             let row = [...this.grid[r]];
             let newRow = Array(this.boardSize).fill(null);
             let targetIdx = 0;
-            
+
             for (let c = 0; c < this.boardSize; c++) {
                 if (row[c] === null) continue;
-                
+
                 const currentTile = row[c];
 
                 if (currentTile.value === 'joker') {
                     // 조커 이동 로직
-                    if (targetIdx > 0 && newRow[targetIdx-1] && newRow[targetIdx-1].value !== 'joker') {
-                        newRow[targetIdx-1].value *= 2;
-                        scoreEarned += newRow[targetIdx-1].value;
+                    if (targetIdx > 0 && newRow[targetIdx - 1] && newRow[targetIdx - 1].value !== 'joker') {
+                        newRow[targetIdx - 1].value *= 2;
+                        scoreEarned += newRow[targetIdx - 1].value;
                         mergeCount++;
-                        mergedIds.push(newRow[targetIdx-1].id);
+                        mergedIds.push(newRow[targetIdx - 1].id);
                         moved = true;
                         jokerUsedInMove = true; // 조커 포인트: 기존 타일을 업그레이드함
                     } else {
@@ -388,19 +389,19 @@ class ZeonsCity2048 {
                     continue;
                 }
 
-                if (targetIdx > 0 && newRow[targetIdx-1] && newRow[targetIdx-1].value === currentTile.value) {
+                if (targetIdx > 0 && newRow[targetIdx - 1] && newRow[targetIdx - 1].value === currentTile.value) {
                     // 병합
-                    newRow[targetIdx-1].value *= 2;
-                    const val = newRow[targetIdx-1].value;
+                    newRow[targetIdx - 1].value *= 2;
+                    const val = newRow[targetIdx - 1].value;
                     scoreEarned += val;
                     if (val > maxNewValue) maxNewValue = val;
                     mergeCount++;
-                    mergedIds.push(newRow[targetIdx-1].id);
+                    mergedIds.push(newRow[targetIdx - 1].id);
                     moved = true;
-                } else if (targetIdx > 0 && newRow[targetIdx-1] && newRow[targetIdx-1].value === 'joker') {
+                } else if (targetIdx > 0 && newRow[targetIdx - 1] && newRow[targetIdx - 1].value === 'joker') {
                     // 조커 뒤의 타일이 조커와 만나 업그레이드
                     currentTile.value *= 2;
-                    newRow[targetIdx-1] = currentTile;
+                    newRow[targetIdx - 1] = currentTile;
                     scoreEarned += currentTile.value;
                     mergeCount++;
                     mergedIds.push(currentTile.id);
@@ -420,10 +421,10 @@ class ZeonsCity2048 {
             this.score += scoreEarned;
             this.updateScores();
             this.triggerEffects(mergeCount, maxNewValue);
-            
+
             // 렌더링 호출
             this.renderGrid(mergedIds);
-            
+
             setTimeout(() => {
                 if (!jokerUsedInMove) {
                     this.addRandomTile();
@@ -459,26 +460,26 @@ class ZeonsCity2048 {
         const bestBox = this.bestScoreDisplay.parentElement;
         if (bestBox && !bestBox.classList.contains('best-score-update')) {
             bestBox.classList.add('best-score-update');
-            
+
             // 효과음은 한 게임 세션 동안 단 한 번만 재생
             if (!this.hasTriggeredBestScoreThisGame) {
                 this.playBestScoreSound();
                 this.hasTriggeredBestScoreThisGame = true;
             }
-            
+
             setTimeout(() => bestBox.classList.remove('best-score-update'), 800);
         }
     }
 
     resetBestScore() {
         if (this.bestScore === 0) return;
-        
+
         if (confirm('베스트 스코어를 초기화하시겠습니까?')) {
             this.bestScore = 0;
             localStorage.setItem('zeons-build2048-best-score', '0');
             this.bestScoreDisplay.textContent = '0';
             this.showEventToast("베스트 스코어가 초기화되었습니다.", false);
-            
+
             // 시각적 피드백 (잠시 강조)
             const bestBox = this.bestScoreDisplay.parentElement;
             bestBox.style.transition = 'none';
@@ -526,25 +527,25 @@ class ZeonsCity2048 {
     updateLevelUI() {
         const tiles = this.grid.flat().filter(t => t && typeof t.value === 'number');
         const levelDisplay = document.getElementById('current-level');
-        
+
         if (tiles.length === 0) {
             if (levelDisplay) levelDisplay.textContent = 'LV.1';
             this.currentLevel = 1;
             return;
         }
-        
+
         const maxVal = Math.max(...tiles.map(t => t.value));
         const level = Math.log2(maxVal);
-        
+
         if (levelDisplay) {
             levelDisplay.textContent = `LV.${level}`;
-            
+
             // 레벨업 애니메이션 (강조)
             if (this.currentLevel < level) {
                 this.currentLevel = level;
                 levelDisplay.classList.add('level-up');
                 setTimeout(() => levelDisplay.classList.remove('level-up'), 500);
-                
+
                 // 타일 이동(0.15s)이 완료된 후 효과가 나타나도록 딜레이 유지
                 setTimeout(() => {
                     const highestTile = tiles.find(t => Math.log2(t.value) === level);
@@ -562,7 +563,7 @@ class ZeonsCity2048 {
 
         // 1. 타일 강조 (Pop)
         tileEl.classList.add('tile-discovery');
-        
+
         // 2. 황금 파티클 폭죽 (Fireworks)
         const rect = tileEl.getBoundingClientRect();
         const centerX = rect.left + rect.width / 2;
@@ -578,24 +579,24 @@ class ZeonsCity2048 {
     createDiscoveryParticle(x, y) {
         const particle = document.createElement('div');
         particle.className = 'discovery-particle';
-        
+
         const angle = Math.random() * Math.PI * 2;
         const distance = 40 + Math.random() * 120;
         const tx = Math.cos(angle) * distance;
         const ty = Math.sin(angle) * distance;
-        
+
         particle.style.left = `${x}px`;
         particle.style.top = `${y}px`;
         particle.style.setProperty('--tx', `${tx}px`);
         particle.style.setProperty('--ty', `${ty}px`);
-        
+
         const size = 3 + Math.random() * 5;
         particle.style.width = `${size}px`;
         particle.style.height = `${size}px`;
-        
+
         const duration = 600 + Math.random() * 800;
         particle.style.animation = `particleBurst ${duration}ms cubic-bezier(0.1, 0.5, 0.3, 1) forwards`;
-        
+
         document.body.appendChild(particle);
         setTimeout(() => particle.remove(), duration);
     }
@@ -618,7 +619,7 @@ class ZeonsCity2048 {
         // 효과음은 항상 재생
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         const now = audioCtx.currentTime;
-        
+
         const playNote = (freq, start, dur) => {
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
@@ -635,7 +636,7 @@ class ZeonsCity2048 {
         playNote(523.25, now, 0.1);    // C5
         playNote(659.25, now + 0.1, 0.1); // E5
         playNote(783.99, now + 0.2, 0.2); // G5
-        
+
         setTimeout(() => audioCtx.close(), 600);
     }
 
@@ -646,19 +647,19 @@ class ZeonsCity2048 {
     playBestScoreSound() {
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         const now = audioCtx.currentTime;
-        
+
         const playTing = (freq, start, dur) => {
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
-            
+
             osc.type = 'sine';
             osc.frequency.setValueAtTime(freq, start);
-            
+
             // 크리스탈 같은 맑은 소리를 위해 고주파수 감쇠
             gain.gain.setValueAtTime(0, start);
             gain.gain.linearRampToValueAtTime(0.2, start + 0.01);
             gain.gain.exponentialRampToValueAtTime(0.001, start + dur);
-            
+
             osc.connect(gain);
             gain.connect(audioCtx.destination);
             osc.start(start);
@@ -668,7 +669,7 @@ class ZeonsCity2048 {
         // 아주 맑고 높은 소리 (B6, E7)
         playTing(1975.53, now, 0.4);
         playTing(2637.02, now + 0.05, 0.6);
-        
+
         setTimeout(() => audioCtx.close(), 1000);
     }
 
@@ -680,16 +681,16 @@ class ZeonsCity2048 {
             osc.type = type;
             osc.connect(gain);
             gain.connect(audioCtx.destination);
-            
+
             osc.frequency.setTargetAtTime(startFreq, audioCtx.currentTime, 0);
             osc.frequency.exponentialRampToValueAtTime(endFreq, audioCtx.currentTime + 0.1);
             gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
-            
+
             osc.start();
             osc.stop(audioCtx.currentTime + duration);
             setTimeout(() => audioCtx.close(), (duration + 0.1) * 1000);
-        } catch (e) {}
+        } catch (e) { }
     }
 
     checkGameState() {
@@ -705,7 +706,7 @@ class ZeonsCity2048 {
             for (let r = 0; r < this.boardSize; r++) {
                 for (let c = 0; c < this.boardSize; c++) {
                     const val = this.grid[r][c];
-                    if ((c < 3 && val === this.grid[r][c+1]) || (r < 3 && val === this.grid[r+1][c])) {
+                    if ((c < 3 && val === this.grid[r][c + 1]) || (r < 3 && val === this.grid[r + 1][c])) {
                         canMove = true;
                         break;
                     }
@@ -731,10 +732,10 @@ class ZeonsCity2048 {
             if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
                 e.preventDefault();
                 this.move(e.key);
-                
+
                 // BGM 시작 (사용자 설정이 활성화된 경우만)
                 if (this.bgmEnabled && this.bgm.paused) {
-                    this.bgm.play().catch(() => {});
+                    this.bgm.play().catch(() => { });
                 }
             }
         });
@@ -754,7 +755,7 @@ class ZeonsCity2048 {
                 soundOn.classList.add('hidden');
                 soundOff.classList.remove('hidden');
             } else {
-                this.bgm.play().catch(() => {});
+                this.bgm.play().catch(() => { });
                 soundOn.classList.remove('hidden');
                 soundOff.classList.add('hidden');
             }
@@ -764,11 +765,11 @@ class ZeonsCity2048 {
         // 조커 버튼
         const jokerBtn = document.getElementById('joker-button');
         const jokerCountSpan = document.getElementById('joker-count');
-        
+
         jokerBtn.addEventListener('click', () => {
             if (this.isLocked) return; // 입력 잠금 시 조작 방지
             if (this.jokerCount <= 0) return;
-            
+
             const emptyCells = [];
             for (let r = 0; r < this.boardSize; r++) {
                 for (let c = 0; c < this.boardSize; c++) {
@@ -782,10 +783,10 @@ class ZeonsCity2048 {
                     value: 'joker',
                     id: this.nextTileId++
                 };
-                
+
                 this.jokerCount--;
                 this.updateJokerUI();
-                
+
                 this.renderGrid();
                 this.showEventToast(`조커 빌딩 건설!`, false);
                 this.playUpSound();
@@ -809,15 +810,19 @@ class ZeonsCity2048 {
             const bgmInfo = document.getElementById('bgm-info');
             const intro = document.querySelector('.game-intro');
             const messageButtons = document.querySelector('.message-buttons');
-            
+
             // 캡처 시 불필요한 UI 숨김
             if (bgmInfo) bgmInfo.style.opacity = '0';
             if (intro) intro.style.opacity = '0';
             if (messageButtons) messageButtons.style.opacity = '0';
-            
+
+            // 서비스 URL (GitHub Pages)
+            const serviceUrl = 'https://zeons.github.io/CITY2048/';
+            const level = this.currentLevel || 1;
+
             try {
                 this.showEventToast("이미지 생성 중...", false);
-                
+
                 const canvas = await html2canvas(container, {
                     backgroundColor: '#0d1117',
                     scale: 2,
@@ -828,29 +833,34 @@ class ZeonsCity2048 {
                 const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
                 const file = new File([blob], 'zeons-city-2048.png', { type: 'image/png' });
 
-                const url = window.location.href;
-                const text = `🌆 ZEONS CITY 2048\n\n거대 마천루를 세웠습니다! (City Level: LV.${this.currentLevel})\n내 최고 점수: ${this.bestScore}점\n함께 도시를 건설해볼까요?\n\n${url}`;
-                
+                const shareText = `🌆 ZEONS CITY 2048\n\n거대 마천루를 세웠습니다! (City Level: LV.${level})\n내 최고 점수: ${this.bestScore}점\n함께 도시를 건설해볼까요?\n\n${serviceUrl}`;
+
                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
                     await navigator.share({
                         files: [file],
                         title: 'ZEONS City 2048',
-                        text: text,
-                        url: url
+                        text: shareText
                     });
-                } else {
+                } else if (navigator.share) {
                     await navigator.share({
                         title: 'ZEONS City 2048',
-                        text: text,
-                        url: url
+                        text: shareText
                     });
+                } else {
+                    // Web Share API 미지원 시 클립보드 복사
+                    await navigator.clipboard.writeText(shareText);
+                    alert('결과가 클립보드에 복사되었습니다!');
                 }
             } catch (err) {
                 console.error("공유 실패:", err);
-                const url = window.location.href;
-                const text = `🌆 ZEONS CITY 2048\n최고 점수: ${this.bestScore}점 (City Level: LV.${this.currentLevel})\n${url}`;
-                navigator.clipboard.writeText(text);
-                alert('결과가 클립보드에 복사되었습니다!');
+                const fallbackText = `🌆 ZEONS CITY 2048\n최고 점수: ${this.bestScore}점 (City Level: LV.${level})\n${serviceUrl}`;
+                try {
+                    await navigator.clipboard.writeText(fallbackText);
+                    alert('결과가 클립보드에 복사되었습니다!');
+                } catch (clipErr) {
+                    // 클립보드도 실패 시 프롬프트로 표시
+                    prompt('아래 텍스트를 복사하세요:', fallbackText);
+                }
             } finally {
                 // UI 다시 표시
                 if (bgmInfo) bgmInfo.style.opacity = '1';
@@ -885,7 +895,7 @@ class ZeonsCity2048 {
         board.addEventListener('touchend', (e) => {
             if (!touchStartX || !touchStartY) return;
             if (this.isLocked) return; // 입력 잠금 시 조작 방지
-            
+
             const dx = e.changedTouches[0].clientX - touchStartX;
             const dy = e.changedTouches[0].clientY - touchStartY;
             const absDx = Math.abs(dx);
@@ -917,7 +927,7 @@ class ZeonsCity2048 {
         window.addEventListener('mouseup', (e) => {
             if (!isMouseDown) return;
             if (this.isLocked) return; // 입력 잠금 시 조작 방지
-            
+
             const dx = e.clientX - mouseStartX;
             const dy = e.clientY - mouseStartY;
             const absDx = Math.abs(dx);
@@ -956,22 +966,22 @@ class ZeonsCity2048 {
 
     setupGame() {
         if (this.isLocked) return;
-        
+
         this.grid = Array(4).fill().map(() => Array(4).fill(null));
         this.score = 0;
         this.reachedMilestones.clear();
         this.jokerCount = 0;
         this.currentLevel = 1;
-        
+
         // 새로운 게임 시작 시 계절 무작위 변경
         this.currentSeason = this.getRandomSeason();
         this.syncSeasonUI();
         this.playRandomBGM(); // 재시작 시 BGM 랜덤 변경
-        
+
         document.getElementById('score').textContent = '0';
         this.updateJokerUI();
         this.updateLevelUI();
-        
+
         // 인트로 연출 시작
         this.startIntroAnimation();
     }
@@ -980,15 +990,15 @@ class ZeonsCity2048 {
         this.isLocked = true;
         const board = document.getElementById('game-board');
         board.classList.add('intro-mode');
-        
+
         // 17종 건물 값 정의 (2^1부터 2^17까지)
         const allValues = [
-            2, 4, 8, 16, 
-            32, 64, 128, 256, 
-            512, 1024, 2048, 4096, 
+            2, 4, 8, 16,
+            32, 64, 128, 256,
+            512, 1024, 2048, 4096,
             8192, 16384, 32768, 65536, 131072
         ];
-        
+
         // 보드판(16칸)에 1단계부터 16단계까지 순서대로 배치
         let idx = 0;
         for (let r = 0; r < 4; r++) {
@@ -999,10 +1009,10 @@ class ZeonsCity2048 {
                 };
             }
         }
-        
+
         this.renderGrid();
         this.showEventToast("도시 건설 준비 중...", false);
-        
+
         if (this.introTimeout) clearTimeout(this.introTimeout);
         this.introTimeout = setTimeout(() => {
             board.classList.remove('intro-mode');
@@ -1023,7 +1033,7 @@ class ZeonsCity2048 {
 // 게임 시작
 window.addEventListener('DOMContentLoaded', () => {
     const game = new ZeonsCity2048();
-    
+
     // PWA: 서비스 워커 등록
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
