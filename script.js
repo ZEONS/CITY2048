@@ -828,24 +828,27 @@ class ZeonsCity2048 {
                 const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
                 const file = new File([blob], 'zeons-city-2048.png', { type: 'image/png' });
 
-                const text = `🌆 ZEONS CITY 2048\n\n거대 마천루를 세웠습니다! (City Level: LV.${this.currentLevel})\n내 최고 점수: ${this.bestScore}점\n함께 도시를 건설해볼까요?`;
+                const url = window.location.href;
+                const text = `🌆 ZEONS CITY 2048\n\n거대 마천루를 세웠습니다! (City Level: LV.${this.currentLevel})\n내 최고 점수: ${this.bestScore}점\n함께 도시를 건설해볼까요?\n\n${url}`;
                 
                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
                     await navigator.share({
                         files: [file],
                         title: 'ZEONS City 2048',
-                        text: text
+                        text: text,
+                        url: url
                     });
                 } else {
                     await navigator.share({
                         title: 'ZEONS City 2048',
                         text: text,
-                        url: window.location.href
+                        url: url
                     });
                 }
             } catch (err) {
                 console.error("공유 실패:", err);
-                const text = `🌆 ZEONS CITY 2048\n최고 점수: ${this.bestScore}점 (City Level: LV.${this.currentLevel})\n${window.location.href}`;
+                const url = window.location.href;
+                const text = `🌆 ZEONS CITY 2048\n최고 점수: ${this.bestScore}점 (City Level: LV.${this.currentLevel})\n${url}`;
                 navigator.clipboard.writeText(text);
                 alert('결과가 클립보드에 복사되었습니다!');
             } finally {
@@ -1019,5 +1022,78 @@ class ZeonsCity2048 {
 
 // 게임 시작
 window.addEventListener('DOMContentLoaded', () => {
-    new ZeonsCity2048();
+    const game = new ZeonsCity2048();
+    
+    // PWA: 서비스 워커 등록
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js').then(registration => {
+                console.log('ServiceWorker registration successful with scope: ', registration.scope);
+            }, err => {
+                console.log('ServiceWorker registration failed: ', err);
+            });
+        });
+    }
+
+    // A2HS (Add to Home Screen) 로직
+    let deferredPrompt;
+    const installBtn = document.getElementById('install-button');
+    const iosGuide = document.getElementById('ios-install-guide');
+    const closeGuide = document.getElementById('close-guide');
+
+    // iOS 감지
+    const isIos = () => {
+        const userAgent = window.navigator.userAgent.toLowerCase();
+        return /iphone|ipad|ipod/.test(userAgent);
+    };
+
+    // 웹앱 모드(standalone) 감지
+    const isInStandaloneMode = () => ('standalone' in window.navigator) && (window.navigator.standalone) || window.matchMedia('(display-mode: standalone)').matches;
+
+    // 초기 버튼 표시 설정
+    if (!isInStandaloneMode()) {
+        // standalone 모드가 아니면 버튼을 항상 표시하여 설치 유도 (iOS/Android 공통)
+        if (installBtn) installBtn.classList.remove('hidden');
+    }
+
+    // Android/Chrome: 설치 유도 이벤트 캐치
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        if (installBtn && !isInStandaloneMode()) {
+            installBtn.classList.remove('hidden');
+        }
+    });
+
+    if (installBtn) {
+        installBtn.addEventListener('click', async () => {
+            if (isIos()) {
+                // iOS: 안내 팝업 표시
+                if (iosGuide) iosGuide.classList.remove('hidden');
+            } else if (deferredPrompt) {
+                // Android/Desktop: 설치 프롬프트 표시
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    installBtn.classList.add('hidden');
+                }
+                deferredPrompt = null;
+            } else {
+                // 이미 설치되었거나 직접 설치를 지원하지 않는 경우 가이드 팝업 표시
+                if (iosGuide) iosGuide.classList.remove('hidden');
+            }
+        });
+    }
+
+    if (closeGuide) {
+        closeGuide.addEventListener('click', () => {
+            if (iosGuide) iosGuide.classList.add('hidden');
+        });
+    }
+
+    // 설치 완료 시 버튼 숨김
+    window.addEventListener('appinstalled', (evt) => {
+        if (installBtn) installBtn.classList.add('hidden');
+        console.log('ZEONS CITY was installed');
+    });
 });
