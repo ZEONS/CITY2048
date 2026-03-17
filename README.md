@@ -63,7 +63,7 @@
 
 
 
-## 실행
+## 앱 실행
 
 https://zeons.github.io/CITY2048/
 
