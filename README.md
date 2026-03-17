@@ -1,5 +1,5 @@
 # ZEONS CITY 2048
-## _2048 Web Game_
+## _2048 Web App Game_
 
 
 <img src="https://img.shields.io/badge/HTML5-ED4242?style=flat&logo=HTML5&logoColor=white"/>  <img src="https://img.shields.io/badge/CSS3-00A4DE?style=flat&logo=css3&logoColor=white"/>  <img src="https://img.shields.io/badge/JavaScript-000000?style=flat&logo=javascript&logoColor=white"/>
