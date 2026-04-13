@@ -1,107 +1,91 @@
-# ZEONS CITY 2048
-## _2048 Web App Game_
+# 🌆 ZEONS CITY 2048
+### "나만의 웅장한 도시를 건설하는 3D 전략 퍼즐 게임"
 
+[![HTML5](https://img.shields.io/badge/HTML5-ED4242?style=for-the-badge&logo=HTML5&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/HTML5)
+[![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/CSS)
+[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![PWA](https://img.shields.io/badge/PWA-5A0FC8?style=for-the-badge&logo=pwa&logoColor=white)](https://web.dev/progressive-web-apps/)
 
-<img src="https://img.shields.io/badge/HTML5-ED4242?style=flat&logo=HTML5&logoColor=white"/>  <img src="https://img.shields.io/badge/CSS3-00A4DE?style=flat&logo=css3&logoColor=white"/>  <img src="https://img.shields.io/badge/JavaScript-000000?style=flat&logo=javascript&logoColor=white"/>
+---
 
+## 📖 프로젝트 소개
+**ZEONS CITY 2048**은 고전적인 2048 퍼즐 게임의 로직을 현대적인 **도시 건설 테마**와 **3D 시각 효과**로 재해석한 웹 애플리케이션입니다. 같은 가치의 건물을 합쳐 더 거대하고 세련된 마천루로 진화시키며, 자신만의 도시를 완성해 나가는 즐거움을 선사합니다.
 
-<img src="https://img.shields.io/badge/NotebookLM-ED4242?style=flat&logo=NotebookLM&logoColor=white"/>  <img src="https://img.shields.io/badge/Antigravity-000000?style=flat&logo=Antigravity&logoColor=white"/>
+이 프로젝트는 **구글 노트북LM(NotebookLM)**과 **안티그래비티(Antigravity)**를 활용한 **'바이브 코딩(Vibe Coding)'**의 대표적인 사례로, 기획부터 핵심 로직 구현까지 AI와 인간의 협업으로 완성되었습니다.
 
-구늘 노트북LM 과 안티그래비티를 사용해서 바이브코딩한 사례 입니다.
-<!--
-![N|Solid](https://notebooklm.google/_/static/branding/v4/light_mode/notebook-logo.svg)
+---
 
+## ✨ 핵심 기능 (Key Features)
 
+### 1. 시각적 경험 (Visual Experience)
+- **3D Isometric Board:** CSS의 `perspective`와 `transform`을 활용하여 입체감 있는 3D 보드판을 구현했습니다.
+- **Dynamic Weather System:** 게임 진행 중 실시간으로 계절이 변화하며, 그에 따른 날씨 효과(벚꽃, 햇살, 낙엽, 눈)가 화면을 채웁니다.
+- **Building Evolution:** 2부터 131,072까지 총 17단계의 고퀄리티 건물 이미지로 도시의 발전 단계를 시각화합니다.
+- **Ambient Animation:** 하늘을 가로지르는 제온스(ZEONS) 비행선과 부드러운 타일 이동 애니메이션이 몰입감을 더합니다.
 
-<img src="https://simpleicons.org/icons/notebooklm.svg"/>
-<img src="https://img.shield.io/badge/notebooklm?sytle=flat-square&logo=notebooklm&logocolor=white"/>
+### 2. 전략적 메커니즘 (Game Logic)
+- **Joker Building System:** 3콤보 이상 달성 시 획득하는 '조커 빌딩' 아이템을 통해, 원하는 위치에서 타일을 즉시 업그레이드할 수 있는 전략적 요소를 추가했습니다.
+- **City Leveling:** 최고 타일의 가치에 따라 도시 레벨(LV)이 상승하며, 레벨업 시 화려한 파티클 효과가 나타납니다.
+- **Progressive UI:** 게임 플레이 중 숫자를 숨기고 건물 위주로 감상하거나, BGM을 자유롭게 선택할 수 있는 편의 기능을 제공합니다.
 
--->
+### 3. 기술적 완성도 (Technical Details)
+- **PWA (Progressive Web App):** 오프라인 실행 지원 및 서비스 워커를 통한 설치가 가능하여, 모바일 기기에서 앱처럼 사용할 수 있습니다.
+- **Web Share & Capture:** `html2canvas`를 활용하여 현재 도시의 스크린샷을 생성하고, Web Share API를 통해 SNS에 즉시 최고의 점수를 공유할 수 있습니다.
+- **Synthesized Audio:** Web Audio API(`AudioContext`)를 사용하여 콤보 및 레벨업 시 청량한 사운드 효과를 실시간으로 생성합니다.
 
-## 노트북LM, 구글 안티그래비티
+---
 
-노트북LM 과 구글 안티그래비티 (Google Antigravity) 를 이용해서 바이브 코딩으로 2048 게임을 만들었습니다.
+## 🛠 기술 스택 (Tech Stack)
+- **Core:** Vanilla JavaScript (ES6+), HTML5, CSS3
+- **Libraries:**
+  - `html2canvas`: 스크린샷 생성
+  - `Service Worker`: PWA 지원 및 캐싱
+- **Design Tools:** Photopea (Asset editing)
+- **AI Orchestration:** Google NotebookLM & Antigravity
 
-- 노트북LM 으로 2048 게임에 대한 분석과 게임 기회 과 구현 기능을 설명
-- 노트북LM 에게 구글 안티그래비티가 개발 할 수 있도록 프롬프트 를 작성 요청
-- 작성된 프롬프트 를 구글 안티그래비티 프폼프트 창에 입력 후, 개발 시작
+---
 
+## 🚀 시작하기 & 설치 (Get Started)
 
-총 제작 시간은 약 8시간 이 걸렸습니다.
+### 1. 온라인 플레이
+아래 주소에서 즉시 플레이할 수 있습니다.
+👉 [https://zeons.github.io/CITY2048/](https://zeons.github.io/CITY2048/)
 
-기본 게임 화면 과 로직 구현은 안티그래비티 가 금방 만들어 주더군요. (약 5분 이내)
+### 2. 앱(PWA) 설치 가이드
+- **Android/Desktop:** 주소창 우측의 '설치' 아이콘 또는 화면 하단의 '앱 설치하기' 버튼 클릭.
+- **iOS (iPhone/iPad):**
+  1. Safari 브라우저에서 접속.
+  2. 하단 **'공유'** 버튼 클릭.
+  3. **'홈 화면에 추가'** 선택.
 
-게임을 테스트 하면서 게임 몰입감, 효과를 위한 이미지 작업 및 추가 JavaScript 기능 추가 하는데 시간이 많이 걸렸습니다.
+---
 
-
-
-
-## 리소스
-| 폴더 | 내용 |
-| ------ | ------ |
-| \reource\airplane | 플래카드 비행기 이미지 |
-| \reource\building | 빌딩이미지 18개 (18.조커빌딩) | |
-
-
-- \resource 폴더에 이미지를 바꾸시면 농촌, 도심, 해변 테마로 사용 가능, 회사 홍보도 가능
-
-- 빌딩, 비행기 이미지 작업은 Photopea 무료 웹 포토에디터 를 사용 https://www.photopea.com/
-
-
-제가 이미지 작업에 전문가가 아니라, 이미지 퀄러티는 좋지 않습니다.
-
-전문가 분들에 참여해서 더 좋은 도시 이미지가 제공되면 좋을 것 같습니다. ^^;
-
-
-
-
-
-## 맺음말
-
-즐겁게 플레이 하시면서 바이브 코딩에 대한 경험을 해보시면 좋을 것 같습니다.
-
-
-
-
-## 앱 실행
-
-https://zeons.github.io/CITY2048/
-
-
-
-
-
-## 프롬프트
-
-```sh
-너는 10년 차 프론트엔드 개발자이자 웹 게임 디자인 전문가야. HTML5, CSS3, JavaScript(또는 React)를 사용하여 '제온스(ZEONS)' 회사의 브랜드 홍보를 위한 모던한 2048 웹 게임을 개발해 줘.
-1. 핵심 게임 로직 (2048 원작 규칙 적용)
-그리드 및 조작: 4x4 그리드에서 진행되는 싱글 플레이어 슬라이딩 블록 퍼즐 게임을 구현해 줘
-. 키보드 방향키(상, 하, 좌, 우)와 모바일 터치 스와이프(Touch Swipe) 이벤트를 모두 지원해야 해
-.
-타일 병합: 타일 이동 시, 같은 값을 가진 인접한 두 타일이 충돌하면 두 값의 합을 가진 새로운 타일로 병합되도록 2D 배열(2D Array) 상태 관리를 구현해 줘
-.
-타일 생성: 이동이 발생할 때마다 빈칸 중 무작위 위치에 새로운 타일이 생성되며, 이때 2가 나올 확률은 90%, 4가 나올 확률은 10%로 설정해
-.
-승패 조건: 16칸이 꽉 차고 인접한 타일 중 더 이상 병합할 타일이 없으면 '게임 오버'로 처리하고, 최종 목표인 2048 타일을 만들면 '게임 클리어(승리)' 팝업을 띄워줘
-.
-2. 디자인 및 UI 커스터마이징 (제온스 브랜드 테마)
-건물 진화 시스템 (핵심): 타일에 숫자를 텍스트로 보여주는 대신, 숫자에 매핑되는 CSS 클래스를 부여하여 건물 아이콘이나 이미지로 렌더링해 줘
-.
-예시: 2는 작은 오두막, 4는 2층 주택, 8은 상가 건물로 시작하여 값이 커질수록 건물이 발전함. 최종적으로 2048에 도달하면 '제온스(ZEONS) 로고가 크게 박힌 웅장한 마천루(빌딩)' 요소가 나타나도록 코드를 구성해 줘.
-비행선 애니메이션: 게임 플레이 화면 배경의 최상단 레이어에 제온스 로고가 그려진 비행선 요소(absolute 포지션)를 띄워줘. CSS @keyframes를 사용해 이 비행선이 무작위 높이에서 30초~1분 주기로 화면 좌측에서 우측으로 천천히 가로지르도록 애니메이션을 작성해.
-시각 효과: 타일 이동 시 딱딱하게 끊기지 않고 부드럽게 미끄러지도록 CSS의 transition 속성(예: left, top)을 적용하고, 타일이 병합될 때 일시적으로 크기가 커졌다 작아지는(Pop) 스케일 애니메이션을 추가해 줘
-. 전체 테마는 현대적인 플랫(Flat) 디자인이나 세련된 야경 테마로 구성해.
-3. 부가 기능
-점수 시스템: 타일이 병합될 때마다 합쳐진 타일의 값만큼 현재 점수(Score)가 올라가도록 계산해 줘
-.
-하이스코어 유지: 최고 점수(Best Score)는 브라우저의 localStorage API를 활용하여 사용자가 창을 닫아도 기기에 저장되고 불러와지도록 구현해 줘
-.
-SNS 공유 기능: 게임 오버 또는 클리어 시 "나는 제온스 시티에 빌딩을 세웠다! 내 최고 점수: [점수]점"이라는 문구와 함께 게임 URL을 공유할 수 있도록 Web Share API를 연동한 '공유하기 버튼'을 만들어 줘.
-오디오 제어: HTML5 <audio> 태그를 사용해 모던한 일렉트로닉이나 로파이(Lo-fi) 배경음악(BGM)이 재생되도록 하고, 타일이 합쳐져 건물이 진화할 때마다 재생될 경쾌한 효과음 함수를 포함해 줘.
-간단하게 웹앱(홈 화면 추가)으로 설치할 수 있게 버튼을 만들어 주고, 웹앱 설치가 어려운 경우 앱웹 설치 안내 팝업을 띄워 줘.
-웹앱 설치시 아이콘 이미지가 보이도록 구성해 줘.
-
-4. 출력 요구사항
-HTML 구조, CSS 스타일링, JavaScript 핵심 로직을 분리하여 제공하고, 각 코드 블록이 어떤 역할을 하는지 주석으로 상세히 설명해 줘. 복사 및 붙여넣기만으로 바로 브라우저에서 실행 가능한 형태여야 해.
+## 📁 디렉토리 구조
+```text
+/c:/Works/CITY2048
+├── index.html        # 게임 메인 레이아웃
+├── style.css         # 3D 테마 및 애니메이션 스타일링
+├── script.js        # 게임 로직, 날씨, 오디오 및 PWA 연동
+├── manifest.json     # PWA 설치 정보
+├── sw.js             # 서비스 워커 (오프라인 캐싱)
+└── resource/         # 건물 및 비행선 이미지 자산
 ```
+
+---
+
+## 💡 개발기 (The Vibe Coding Story)
+> "전통적인 코딩 방식에서 벗어나, NotebookLM으로 기획을 분석하고 Antigravity와 대화하며 자연스럽게 흐르듯 개발했습니다."
+
+- **기획 단계:** NotebookLM을 통해 2048 게임의 본질과 도시 건설 테마의 결합 아이디어 도출.
+- **구현 단계:** Antigravity에게 10년 차 개발자 페르소나를 부여하여 부드러운 타일 이동과 정교한 3D CSS 구축.
+- **폴리싱:** 사용자의 피드백을 실시간으로 반영하며 날씨 이펙트와 BGM 시스템 추가.
+
+---
+
+## 🎨 자원 활용
+- **빌딩 및 비행선 이미지:** Photopea를 활용하여 제작.
+- **폰트:** Google Fonts (Outfit, Inter).
+- **효과음:** Web Audio API를 활용한 자체 합성음.
+
+---
+**ZEONS CITY 2048**과 함께 세련된 미래 도시를 건설해 보세요! 🌃
